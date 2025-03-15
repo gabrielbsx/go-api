@@ -27,10 +27,9 @@ func NewProductController(usecase ProductUsecase) ProductController {
 func (p *productController) CreateProduct(ctx *gin.Context) {
 	var product ProductModel
 
-	err := ctx.BindJSON(&product)
-
-	if err != nil {
+	if err := ctx.ShouldBindJSON(&product); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	productCreated, err := p.usecase.CreateProduct(product)
@@ -43,7 +42,7 @@ func (p *productController) CreateProduct(ctx *gin.Context) {
 }
 
 func (u *productController) GetProduct(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id := ctx.Param("product_id")
 
 	if id == "" {
 		response := shared_models.Response{
@@ -59,6 +58,15 @@ func (u *productController) GetProduct(ctx *gin.Context) {
 	if err != nil {
 		response := shared_models.Response{
 			Message: "ID must be a number",
+		}
+
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	if productID <= 0 {
+		response := shared_models.Response{
+			Message: "ID must be greater than 0",
 		}
 
 		ctx.JSON(http.StatusBadRequest, response)
