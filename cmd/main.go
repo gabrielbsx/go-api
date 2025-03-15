@@ -23,10 +23,10 @@ func main() {
 	ProductRepository := repositories.NewProductRepository(dbConnection)
 
 	// Use cases
-	GetProductUsecase := usecase.NewGetProductUsecase(ProductRepository)
+	ProductUsecase := usecase.NewProductUsecase(ProductRepository)
 
 	// Controllers
-	ProductController := controllers.NewProductController(GetProductUsecase)
+	ProductController := controllers.NewProductController(ProductUsecase)
 
 	server.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
@@ -35,6 +35,7 @@ func main() {
 	})
 
 	server.GET("/products", ProductController.GetProducts)
+	server.POST("/products", ProductController.CreateProduct)
 
 	server.Run(":3000")
 }
