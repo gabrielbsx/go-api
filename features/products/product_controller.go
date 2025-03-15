@@ -8,17 +8,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ProductController struct {
-	productUsecase ProductUsecase
+type ProductController interface {
+	CreateProduct(ctx *gin.Context)
+	GetProduct(ctx *gin.Context)
+	GetProducts(ctx *gin.Context)
+}
+
+type productController struct {
+	usecase ProductUsecase
 }
 
 func NewProductController(usecase ProductUsecase) ProductController {
-	return ProductController{
-		productUsecase: usecase,
+	return &productController{
+		usecase: usecase,
 	}
 }
 
-func (p *ProductController) CreateProduct(ctx *gin.Context) {
+func (p *productController) CreateProduct(ctx *gin.Context) {
 	var product ProductModel
 
 	err := ctx.BindJSON(&product)
@@ -27,7 +33,7 @@ func (p *ProductController) CreateProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	productCreated, err := p.productUsecase.CreateProduct(product)
+	productCreated, err := p.usecase.CreateProduct(product)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -36,7 +42,7 @@ func (p *ProductController) CreateProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, productCreated)
 }
 
-func (u *ProductController) GetProduct(ctx *gin.Context) {
+func (u *productController) GetProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if id == "" {
@@ -59,7 +65,7 @@ func (u *ProductController) GetProduct(ctx *gin.Context) {
 		return
 	}
 
-	product, err := u.productUsecase.GetProduct(productID)
+	product, err := u.usecase.GetProduct(productID)
 
 	if err != nil {
 		response := shared_models.Response{
@@ -82,8 +88,8 @@ func (u *ProductController) GetProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, product)
 }
 
-func (p *ProductController) GetProducts(ctx *gin.Context) {
-	products, err := p.productUsecase.GetProducts()
+func (p *productController) GetProducts(ctx *gin.Context) {
+	products, err := p.usecase.GetProducts()
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

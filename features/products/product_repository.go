@@ -5,17 +5,23 @@ import (
 	"log"
 )
 
-type ProductRepository struct {
+type ProductRepository interface {
+	CreateProduct(product ProductModel) (int, error)
+	GetProduct(id int) (*ProductModel, error)
+	GetProducts() ([]ProductModel, error)
+}
+
+type productRepository struct {
 	connection *sql.DB
 }
 
 func NewProductRepository(connection *sql.DB) ProductRepository {
-	return ProductRepository{
+	return &productRepository{
 		connection: connection,
 	}
 }
 
-func (pr *ProductRepository) GetProducts() ([]ProductModel, error) {
+func (pr *productRepository) GetProducts() ([]ProductModel, error) {
 	query := "SELECT id, name, price FROM products"
 
 	rows, err := pr.connection.Query(query)
@@ -50,7 +56,7 @@ func (pr *ProductRepository) GetProducts() ([]ProductModel, error) {
 	return products, nil
 }
 
-func (pr *ProductRepository) CreateProduct(product ProductModel) (int, error) {
+func (pr *productRepository) CreateProduct(product ProductModel) (int, error) {
 	var id int
 
 	query, err := pr.connection.Prepare("INSERT INTO products (name, price) VALUES ($1, $2) RETURNING id")
@@ -70,7 +76,7 @@ func (pr *ProductRepository) CreateProduct(product ProductModel) (int, error) {
 	return id, nil
 }
 
-func (pr *ProductRepository) GetProduct(id int) (*ProductModel, error) {
+func (pr *productRepository) GetProduct(id int) (*ProductModel, error) {
 	query := "SELECT id, name, price FROM products WHERE id = $1"
 
 	row := pr.connection.QueryRow(query, id)

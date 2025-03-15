@@ -1,14 +1,20 @@
 package products
 
-type ProductUsecase struct {
+type ProductUsecase interface {
+	CreateProduct(product ProductModel) (ProductModel, error)
+	GetProduct(id int) (*ProductModel, error)
+	GetProducts() ([]ProductModel, error)
+}
+
+type productUsecase struct {
 	repository ProductRepository
 }
 
 func NewProductUsecase(repository ProductRepository) ProductUsecase {
-	return ProductUsecase{repository: repository}
+	return &productUsecase{repository: repository}
 }
 
-func (u *ProductUsecase) CreateProduct(product ProductModel) (ProductModel, error) {
+func (u *productUsecase) CreateProduct(product ProductModel) (ProductModel, error) {
 	productId, err := u.repository.CreateProduct(product)
 
 	if err != nil {
@@ -20,7 +26,7 @@ func (u *ProductUsecase) CreateProduct(product ProductModel) (ProductModel, erro
 	return product, nil
 }
 
-func (u *ProductUsecase) GetProduct(id int) (*ProductModel, error) {
+func (u *productUsecase) GetProduct(id int) (*ProductModel, error) {
 	product, err := u.repository.GetProduct(id)
 
 	if err != nil {
@@ -30,6 +36,6 @@ func (u *ProductUsecase) GetProduct(id int) (*ProductModel, error) {
 	return product, nil
 }
 
-func (u *ProductUsecase) GetProducts() ([]ProductModel, error) {
+func (u *productUsecase) GetProducts() ([]ProductModel, error) {
 	return u.repository.GetProducts()
 }
