@@ -1,6 +1,6 @@
 package controllers
 
-import "go-api/usecases"
+import usecases "go-api/usecases/products"
 
 type ProductController struct {
 	getProductUsecase usecases.ProductUsecase

@@ -70,3 +70,28 @@ func (pr *ProductRepository) CreateProduct(product models.Product) (int, error) 
 
 	return id, nil
 }
+
+func (pr *ProductRepository) GetProduct(id int) (*models.Product, error) {
+	query := "SELECT id, name, price FROM products WHERE id = $1"
+
+	row := pr.connection.QueryRow(query, id)
+
+	var product models.Product
+
+	err := row.Scan(
+		&product.ID,
+		&product.Name,
+		&product.Price,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		log.Println("Error while scanning product: ", err)
+		return nil, err
+	}
+
+	return &product, nil
+}
