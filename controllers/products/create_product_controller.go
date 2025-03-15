@@ -16,7 +16,7 @@ func (p *ProductController) CreateProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	productCreated, err := p.getProductUsecase.CreateProduct(product)
+	productCreated, err := p.productUsecase.CreateProduct(product)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

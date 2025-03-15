@@ -31,7 +31,7 @@ func (p *ProductController) GetProduct(ctx *gin.Context) {
 		return
 	}
 
-	product, err := p.getProductUsecase.GetProduct(productId)
+	product, err := p.productUsecase.GetProduct(productId)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
