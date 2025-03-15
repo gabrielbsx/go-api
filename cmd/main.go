@@ -1,10 +1,8 @@
 package main
 
 import (
-	productController "go-api/controllers/products"
 	"go-api/data"
-	"go-api/repositories"
-	productUsecase "go-api/usecases/products"
+	ProductFeature "go-api/features/products"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,13 +18,13 @@ func main() {
 	}
 
 	// Repository
-	ProductRepository := repositories.NewProductRepository(dbConnection)
+	ProductRepository := ProductFeature.NewProductRepository(dbConnection)
 
 	// Use cases
-	ProductUsecase := productUsecase.NewProductUsecase(ProductRepository)
+	ProductUsecase := ProductFeature.NewProductUsecase(ProductRepository)
 
 	// Controllers
-	ProductController := productController.NewProductController(ProductUsecase)
+	ProductController := ProductFeature.NewProductController(ProductUsecase)
 
 	server.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{

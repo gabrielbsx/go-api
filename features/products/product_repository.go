@@ -1,8 +1,7 @@
-package repositories
+package products
 
 import (
 	"database/sql"
-	"go-api/models"
 	"log"
 )
 
@@ -16,7 +15,7 @@ func NewProductRepository(connection *sql.DB) ProductRepository {
 	}
 }
 
-func (pr *ProductRepository) GetProducts() ([]models.Product, error) {
+func (pr *ProductRepository) GetProducts() ([]ProductModel, error) {
 	query := "SELECT id, name, price FROM products"
 
 	rows, err := pr.connection.Query(query)
@@ -27,8 +26,8 @@ func (pr *ProductRepository) GetProducts() ([]models.Product, error) {
 		return nil, err
 	}
 
-	var products []models.Product
-	var productTemp models.Product
+	var products []ProductModel
+	var productTemp ProductModel
 
 	for rows.Next() {
 		err = rows.Scan(
@@ -51,7 +50,7 @@ func (pr *ProductRepository) GetProducts() ([]models.Product, error) {
 	return products, nil
 }
 
-func (pr *ProductRepository) CreateProduct(product models.Product) (int, error) {
+func (pr *ProductRepository) CreateProduct(product ProductModel) (int, error) {
 	var id int
 
 	query, err := pr.connection.Prepare("INSERT INTO products (name, price) VALUES ($1, $2) RETURNING id")
@@ -71,12 +70,12 @@ func (pr *ProductRepository) CreateProduct(product models.Product) (int, error) 
 	return id, nil
 }
 
-func (pr *ProductRepository) GetProduct(id int) (*models.Product, error) {
+func (pr *ProductRepository) GetProduct(id int) (*ProductModel, error) {
 	query := "SELECT id, name, price FROM products WHERE id = $1"
 
 	row := pr.connection.QueryRow(query, id)
 
-	var product models.Product
+	var product ProductModel
 
 	err := row.Scan(
 		&product.ID,
