@@ -1,4 +1,4 @@
-package data
+package shared_data
 
 import (
 	"database/sql"

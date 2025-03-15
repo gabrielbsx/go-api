@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go-api/data"
-	ProductFeature "go-api/features/products"
+	"go-api/features/products"
+	shared_data "go-api/shared/data"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,20 +11,20 @@ func main() {
 	server := gin.Default()
 
 	// Data
-	dbConnection, err := data.Connect()
+	dbConnection, err := shared_data.Connect()
 
 	if err != nil {
 		panic(err)
 	}
 
 	// Repository
-	ProductRepository := ProductFeature.NewProductRepository(dbConnection)
+	ProductRepository := products.NewProductRepository(dbConnection)
 
 	// Use cases
-	ProductUsecase := ProductFeature.NewProductUsecase(ProductRepository)
+	ProductUsecase := products.NewProductUsecase(ProductRepository)
 
 	// Controllers
-	ProductController := ProductFeature.NewProductController(ProductUsecase)
+	ProductController := products.NewProductController(ProductUsecase)
 
 	server.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
